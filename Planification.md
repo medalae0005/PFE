@@ -1,96 +1,108 @@
-# Planification du Projet – SmartWash
+# Planification du Projet — SmartWash
 
 ## Introduction
 
-Après la validation du cahier de charge, j’ai commencé la phase de développement du projet **SmartWash**, une application web destinée à organiser le travail dans un centre de lavage automobile afin d’éviter les blocages et améliorer la gestion des véhicules.
+Après la validation du cahier de charge, une phase de réflexion et de préparation du projet **SmartWash** a débuté vers la mi-avril.
 
-La période de développement s’étend du **14 mai au 12 juin**, avant la préparation finale de la soutenance.  
-Le travail est organisé progressivement : **backend → frontend → fonctionnalités avancées → finalisation**.
+La période globale du projet s’étend donc de **mi-avril au 12 juin**, tandis que le développement officiel de l’application a commencé le **16 mai**.
+
+Le travail est organisé progressivement :  
+**maquettage → conception base de donnée → back-end → front-end → finalisation**.
 
 ---
 
-## Phase 1 : Mise en place du Backend
+## Phase 1 : Maquettage
 
-**Période :** 14 mai – 22 mai  
+**Période :** 14 mai – 20 mai  
 
-**Objectif :** construire la base technique de l’application.
+**Objectif :** définir l’organisation visuelle et l’expérience utilisateur de l’application.
 
 **Tâches réalisées :**
-- création de la structure du projet  
-- configuration du dépôt GitHub  
-- conception de la base de données MySQL  
-- création des tables (clients, véhicules, lavages, utilisateurs)  
-- mise en place de la connexion sécurisée avec PHP PDO  
-- développement des opérations CRUD :  
-  - ajout client  
-  - modification  
-  - suppression  
+
+- analyse des besoins fonctionnels  
+- création des maquettes des interfaces principales  
+- définition de la navigation entre les pages  
+- conception du tableau de bord administrateur  
+- choix des couleurs principales et du style graphique  
+- préparation de la structure générale des pages  
+
+---
+
+## Phase 2 : Conception de la Base de Données
+
+**Période :** 21 mai – 22 mai  
+
+**Objectif :** structurer les données nécessaires au fonctionnement du système.
+
+**Tâches réalisées :**
+
+- identification des entités principales  
+- conception du modèle de données  
+- création des tables :
+  - clients  
+  - voitures  
+  - services  
+  - réservations  
+  - statuts  
+- définition des relations entre les tables  
+- préparation de la base MySQL  
+
+---
+
+## Phase 3 : Développement Back-end
+
+**Période :** 23 mai – 29 mai  
+
+**Objectif :** développer la logique fonctionnelle de l’application.
+
+**Tâches réalisées :**
+
+- mise en place de la connexion sécurisée PHP PDO  
+- développement des opérations CRUD :
+  - gestion des clients  
   - gestion des véhicules  
+  - gestion des services  
+- création du système de file d’attente  
+- gestion des statuts des lavages :
+  - en attente  
+  - en cours  
+  - terminé  
 - organisation de la logique métier côté serveur  
 
 ---
 
-## Phase 2 : Gestion du système de lavage (Logique principale)
-
-**Période :** 23 mai – 29 mai  
-
-**Objectif :** développer le cœur fonctionnel du projet.
-
-**Tâches :**
-- création du système de file d’attente  
-- ajout d’une voiture au lavage  
-- gestion des statuts :  
-  - en attente  
-  - en cours  
-  - terminée  
-- mise à jour automatique des états  
-- affichage dynamique de la liste des véhicules  
-
----
-
-## Phase 3 : Développement Frontend
+## Phase 4 : Développement Front-end
 
 **Période :** 30 mai – 5 juin  
 
 **Objectif :** création de l’interface utilisateur.
 
-**Tâches :**
+**Tâches réalisées :**
+
 - intégration des pages en HTML / CSS  
-- création d’un design simple et clair  
-- développement du tableau de bord  
-- formulaires d’ajout client et véhicule  
-- utilisation de JavaScript pour :  
+- application de la charte graphique  
+- création du tableau de bord administrateur  
+- développement des formulaires d’ajout client et véhicule  
+- utilisation de JavaScript pour :
   - validation des formulaires  
   - interactions dynamiques  
   - amélioration de l’expérience utilisateur  
 
 ---
 
-## Phase 4 : Intégration des Notifications WhatsApp
+## Phase 5 : Finalisation et Tests
 
-**Période :** 6 juin – 9 juin  
-
-**Objectif :** automatiser la communication avec le client.
-
-**Travaux réalisés :**
-- intégration d’une API WhatsApp  
-- envoi automatique d’une notification lorsque le lavage est terminé  
-- tests d’envoi de messages  
-- vérification du bon fonctionnement du système  
-
----
-
-## Phase 5 : Tests et Finalisation :)
-
-**Période :** 10 juin – 12 juin  
+**Période :** 6 juin – 12 juin  
 
 **Objectif :** stabiliser et finaliser l’application.
 
-**Tâches :**
+**Tâches réalisées :**
+
+- intégration des notifications WhatsApp via API  
+- tests d’envoi automatique des messages  
 - correction des bugs détectés  
 - optimisation du code  
-- amélioration de l’interface utilisateur  
-- tests complets du workflow de l’application  
+- tests complets du workflow  
 - préparation de la démonstration pour la soutenance  
 
 ---
