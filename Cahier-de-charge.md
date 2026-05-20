@@ -2,162 +2,153 @@
 
 ---
 
-## 1. Introduction simple :
+## 1. Introduction
 
-Dans le cadre de notre projet de développement web, nous avons choisi de réaliser une application nommée SmartWash.
+Dans le cadre de notre projet de développement web, nous avons choisi de réaliser une application nommée **SmartWash**.
 
-Cette application a pour objectif de faciliter la gestion d’une station de lavage automobile en digitalisant les opérations quotidiennes.
+Cette application vise à moderniser la gestion d’une station de lavage automobile en digitalisant les opérations quotidiennes. Actuellement, plusieurs stations de lavage utilisent encore des méthodes traditionnelles basées sur le papier ou la communication directe entre employés, ce qui peut entraîner des erreurs de gestion, une mauvaise organisation des files d’attente et un manque de suivi des activités.
 
-Actuellement, plusieurs stations utilisent encore une gestion manuelle (papier ou communication directe), ce qui provoque parfois des erreurs, une mauvaise organisation des files d’attente et un manque de suivi des clients.
+Le projet SmartWash propose donc une solution informatique simple permettant d’améliorer l’organisation interne et d’optimiser le service offert aux clients.
 
-***Le projet SmartWash propose donc une solution simple permettant :***
+L’application permettra principalement :
 
-1. la gestion des clients.
-2. l’organisation des lavages.
-3. le suivi des voitures en cours.
-4. l’envoi automatique de notifications lorsque le lavage est terminé.
-
----
-
-## 2. Objectifs du Projet :
-
-*Les principaux objectifs sont :*
-
-* Digitaliser le fonctionnement d’une station de lavage.
-* Réduire le temps d’attente des clients.
-* Permettre au gérant de suivre l’activité en temps réel.
-* Informer automatiquement le client quand sa voiture est prête.
+- la gestion des clients par l’administrateur,
+- l’enregistrement des voitures arrivant à la station,
+- l’organisation automatique de la file d’attente,
+- le suivi en temps réel des lavages,
+- l’envoi automatique d’une notification lorsque le lavage est terminé.
 
 ---
 
-## 3. Charte Graphique :
+## 2. Objectifs du Projet
+
+Les principaux objectifs sont :
+
+- Digitaliser le fonctionnement d’une station de lavage automobile.
+- Réduire le temps d’attente et améliorer l’organisation.
+- Permettre au gérant de suivre l’activité en temps réel.
+- Centraliser toutes les informations dans une seule application.
+- Informer automatiquement le client lorsque sa voiture est prête.
+
+---
+
+## 3. Charte Graphique
 
 Afin de garantir une identité visuelle cohérente, une charte graphique simple a été définie pour l’application SmartWash.
 
-### Police :
-* Poppins (ou Arial)
+### Police
+- Poppins (ou Arial)
 
-### Couleurs principales :
-* Bleu : #2563EB
-* Vert : #10B981
-* Orange : #F59E0B
+### Couleurs principales
+- Bleu : `#2563EB`
+- Vert : `#10B981`
+- Orange : `#F59E0B`
 
-### Couleurs de fond :
-* Blanc : #FFFFFF
-* Gris clair : #F8FAFC
+### Couleurs de fond
+- Blanc : `#FFFFFF`
+- Gris clair : `#F8FAFC`
 
-### Style général :
-* Interface simple et claire
-* Design moderne
-* Navigation facile
-* Bonne lisibilité
-
----
-
-## 4. Utilisateurs du Système :
-
-*L’application comporte deux types d’utilisateurs :*
-
-**[\*] Client**
-
-* Enregistrer sa voiture  
-* Demander un service de lavage  
-* Suivre l’état du lavage  
-* Recevoir une notification WhatsApp lorsque la voiture est prête  
-
-**[\*] Administrateur (Gérant)**
-
-* Gérer les clients  
-* Gérer les services de lavage  
-* Organiser la file d’attente  
-* Modifier le statut des voitures  
-* Consulter les statistiques  
+### Style général
+- Interface simple et claire
+- Design moderne
+- Navigation intuitive
+- Bonne lisibilité
 
 ---
 
-## 5. Fonctionnalités Principales :
+## 4. Utilisateurs du Système
 
-Gestion des clients  
-* Ajouter un client  
-* Modifier ou supprimer un client  
-* Associer une voiture à chaque client  
+L’application comporte **un seul type d’utilisateur principal** :
 
-Gestion des services  
-* Création des types de lavage :
-  - Lavage simple  
-  - Lavage complet  
-  - Lavage premium  
+### Administrateur (Gérant)
 
-* Gestion des prix  
+- Enregistrer les clients lors de leur arrivée
+- Ajouter et gérer les voitures
+- Gérer les services de lavage
+- Organiser la file d’attente
+- Modifier le statut des lavages
+- Consulter l’historique
+- Accéder aux statistiques d’activité
+- Envoyer automatiquement une notification WhatsApp au client
 
-Gestion de la file d’attente  
-* Ajout automatique des voitures dans une file  
-* Affichage des voitures en attente  
-* Mise à jour du statut :
-  - En attente  
-  - En cours  
-  - Terminé  
-
-Notification WhatsApp  
-* Envoi automatique d’un message lorsque le lavage est terminé  
+> Le client ne possède pas de compte dans le système.  
+> Toutes les opérations sont réalisées par l’administrateur.
 
 ---
 
-## 6. Technologies Utilisées :
+## 5. Fonctionnalités Principales
 
-### Frontend :
-* HTML5  
-* CSS3  
-* JavaScript  
+### Gestion des clients
+- Ajouter un client
+- Modifier ou supprimer un client
+- Associer une voiture à un client
 
-### Backend :
-* PHP  
-* PDO (connexion sécurisée à la base de données)  
+### Gestion des services
+- Création des types de lavage :
+  - Lavage simple
+  - Lavage complet
+  - Lavage premium
+- Gestion des prix
 
-### Base de Données :
-* MySQL  
+### Gestion de la file d’attente
+- Ajout d’une voiture dans la file d’attente
+- Affichage des voitures en attente
+- Mise à jour du statut :
+  - En attente
+  - En cours
+  - Terminé
 
-### API :
-* API WhatsApp pour les notifications automatiques  
-
----
-
-## 7. Base de Données :
-
-La base de données contiendra principalement :
-
-* clients  
-* voitures  
-* services  
-* reservations  
-* statuts  
+### Notifications WhatsApp
+- Envoi automatique d’un message lorsque le lavage est terminé
 
 ---
 
-## 8. Interfaces de l’Application :
+## 6. Technologies Utilisées
 
-* Page d’accueil  
-* Tableau de bord administrateur  
-* Gestion clients  
-* Gestion services  
-* File d’attente  
-* Historique des lavages  
+### Frontend
+- HTML5
+- CSS3
+- JavaScript
+
+### Backend
+- PHP
+- PDO (connexion sécurisée)
+
+### Base de données
+- MySQL
+
+### API
+- API WhatsApp pour les notifications automatiques
 
 ---
 
-## 9. Contraintes Techniques :
+## 7. Interfaces de l’Application
 
-* Application accessible via navigateur web  
-* Interface simple et intuitive  
-* Sécurisation des données utilisateurs  
-* Connexion sécurisée à la base de données  
+- Page d’accueil
+- Tableau de bord administrateur
+- Gestion des clients
+- Gestion des services
+- File d’attente
+- Historique des lavages
 
 ---
 
-## 10. Résultat Attendu :
+## 8. Contraintes Techniques
 
-*À la fin du projet, SmartWash permettra :*
+- Application accessible via navigateur web
+- Interface simple et intuitive
+- Sécurisation des données
+- Connexion sécurisée à la base de données
+- Temps de réponse rapide
 
-* Une meilleure organisation de la station  
-* Un gain de temps pour le gérant et les clients  
-* Une meilleure expérience utilisateur grâce aux notifications automatiques  
+---
+
+## 9. Résultat Attendu
+
+À la fin du projet, SmartWash permettra :
+
+- Une meilleure organisation de la station de lavage
+- Une gestion centralisée des opérations
+- Un gain de temps pour le gérant
+- Une amélioration de la qualité de service
+- Une meilleure expérience utilisateur grâce aux notifications automatiques
