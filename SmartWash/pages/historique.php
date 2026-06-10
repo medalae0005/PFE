@@ -11,6 +11,9 @@ if (!isset($_SESSION['admin'])) {
 // Connexion à la base de données
 require '../config/database.php';
 
+// Message de recherche
+$searchMessage = '';
+
 // Supprimer un lavage de l'historique
 if (isset($_GET['delete'])) {
 
@@ -23,22 +26,65 @@ if (isset($_GET['delete'])) {
     exit();
 }
 
-// Récupérer les lavages terminés
-$sql = "SELECT lavages.*,
-               voitures.marque,
-               voitures.modele,
-               voitures.immatriculation,
-               clients.nom,
-               services.nom_service,
-               services.prix
-        FROM lavages
-        INNER JOIN voitures ON lavages.id_voiture = voitures.id_voiture
-        INNER JOIN clients ON voitures.id_client = clients.id_client
-        INNER JOIN services ON lavages.id_service = services.id_service
-        WHERE lavages.statut = 'Terminé'
-        ORDER BY lavages.date_fin DESC";
+// Recherche dans l'historique
+$search = '';
 
-$lavages = $pdo->query($sql);
+if (isset($_GET['search'])) {
+
+    $search = trim($_GET['search']);
+
+    if ($search == '') {
+        $searchMessage = "Veuillez saisir un mot-clé pour effectuer une recherche.";
+    }
+}
+
+// Récupérer les lavages terminés
+if ($search != '') {
+
+    $sql = "SELECT lavages.*,
+                   voitures.marque,
+                   voitures.modele,
+                   voitures.immatriculation,
+                   clients.nom,
+                   services.nom_service,
+                   services.prix
+            FROM lavages
+            INNER JOIN voitures ON lavages.id_voiture = voitures.id_voiture
+            INNER JOIN clients ON voitures.id_client = clients.id_client
+            INNER JOIN services ON lavages.id_service = services.id_service
+            WHERE lavages.statut = 'Terminé'
+            AND (
+                clients.nom LIKE ?
+                OR voitures.marque LIKE ?
+                OR voitures.modele LIKE ?
+                OR voitures.immatriculation LIKE ?
+                OR services.nom_service LIKE ?
+            )
+            ORDER BY lavages.date_fin DESC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(["%$search%", "%$search%", "%$search%", "%$search%", "%$search%"]);
+
+    $lavages = $stmt;
+
+} else {
+
+    $sql = "SELECT lavages.*,
+                   voitures.marque,
+                   voitures.modele,
+                   voitures.immatriculation,
+                   clients.nom,
+                   services.nom_service,
+                   services.prix
+            FROM lavages
+            INNER JOIN voitures ON lavages.id_voiture = voitures.id_voiture
+            INNER JOIN clients ON voitures.id_client = clients.id_client
+            INNER JOIN services ON lavages.id_service = services.id_service
+            WHERE lavages.statut = 'Terminé'
+            ORDER BY lavages.date_fin DESC";
+
+    $lavages = $pdo->query($sql);
+}
 ?>
 
 <!DOCTYPE html>
@@ -48,14 +94,13 @@ $lavages = $pdo->query($sql);
 <title>Historique - SmartWash</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/style.css?v=3">
+<link rel="stylesheet" href="../assets/css/style.css?v=11">
 </head>
 
 <body>
 
 <div class="container">
 
-    <!-- Barre latérale de navigation -->
     <aside class="sidebar">
 
         <div class="logo">
@@ -76,10 +121,8 @@ $lavages = $pdo->query($sql);
 
     </aside>
 
-    <!-- Contenu principal -->
     <main class="main">
 
-        <!-- En-tête de la page -->
         <header class="top-bar">
 
             <h2>Historique des lavages</h2>
@@ -98,7 +141,36 @@ $lavages = $pdo->query($sql);
 
         </header>
 
-        <!-- Tableau des lavages terminés -->
+        <!-- Barre de recherche -->
+        <section class="form-box">
+
+            <h3>Rechercher dans l'historique</h3>
+
+            <form method="GET" class="search-form">
+
+                <input type="text"
+                       name="search"
+                       placeholder="Rechercher par client, véhicule ou service"
+                       value="<?php echo $search; ?>">
+
+                <button type="submit">
+                    Rechercher
+                </button>
+
+                <a href="historique.php" class="btn-back">
+                    Réinitialiser
+                </a>
+
+            </form>
+
+            <?php
+            if ($searchMessage != '') {
+                echo "<div class='error'>" . $searchMessage . "</div>";
+            }
+            ?>
+
+        </section>
+
         <section class="table-container">
 
             <table>
@@ -118,30 +190,19 @@ $lavages = $pdo->query($sql);
                 while ($lavage = $lavages->fetch()) {
 
                     echo "<tr>";
-
                     echo "<td>" . $lavage['nom'] . "</td>";
-
                     echo "<td>" . $lavage['marque'] . " " . $lavage['modele'] . "</td>";
-
                     echo "<td>" . $lavage['immatriculation'] . "</td>";
-
                     echo "<td>" . $lavage['nom_service'] . "</td>";
-
                     echo "<td>" . rtrim(rtrim($lavage['prix'], '0'), '.') . " DH</td>";
-
                     echo "<td>" . $lavage['date_arrivee'] . "</td>";
-
                     echo "<td>" . $lavage['date_fin'] . "</td>";
 
-                    echo "<td>";
-                    echo "<div class='actions'>";
-
-                    echo "<a class='btn-delete' href='?delete=" . $lavage['id_lavage'] . "'>
-                            Supprimer
-                          </a>";
-
-                    echo "</div>";
-                    echo "</td>";
+                    echo "<td><div class='actions'>
+                            <a class='btn-delete' href='?delete=" . $lavage['id_lavage'] . "'>
+                                Supprimer
+                            </a>
+                          </div></td>";
 
                     echo "</tr>";
                 }
