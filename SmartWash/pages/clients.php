@@ -13,6 +13,7 @@ require '../config/database.php';
 
 // Message d'erreur ou d'information
 $message = '';
+$searchMessage = '';
 
 // Modifier les informations d'un client
 if (isset($_POST['modifier'])) {
@@ -75,8 +76,36 @@ if (isset($_GET['edit'])) {
     $editClient = $stmt->fetch();
 }
 
+// Recherche des clients
+$search = '';
+
+if (isset($_GET['search'])) {
+
+    $search = trim($_GET['search']);
+
+    if ($search == '') {
+
+        $searchMessage = "Veuillez saisir un mot-clé pour effectuer une recherche.";
+    }
+}
+
 // Récupérer la liste des clients
-$clients = $pdo->query("SELECT * FROM clients ORDER BY id_client DESC");
+if ($search != '') {
+
+    $sql = "SELECT * FROM clients
+            WHERE nom LIKE ?
+            OR telephone LIKE ?
+            ORDER BY id_client DESC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(["%$search%", "%$search%"]);
+
+    $clients = $stmt;
+
+} else {
+
+    $clients = $pdo->query("SELECT * FROM clients ORDER BY id_client DESC");
+}
 ?>
 
 <!DOCTYPE html>
@@ -86,7 +115,7 @@ $clients = $pdo->query("SELECT * FROM clients ORDER BY id_client DESC");
 <title>Clients - SmartWash</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/style.css?v=3">
+<link rel="stylesheet" href="../assets/css/style.css?v=10">
 </head>
 
 <body>
@@ -96,9 +125,9 @@ $clients = $pdo->query("SELECT * FROM clients ORDER BY id_client DESC");
     <!-- Barre latérale de navigation -->
     <aside class="sidebar">
 
-        <div class="logo">
-            SmartWash
-        </div>
+    <div class="logo">
+        SmartWash
+    </div>
 
         <nav class="menu">
             <a href="dashboard.php">Dashboard</a>
@@ -174,23 +203,55 @@ $clients = $pdo->query("SELECT * FROM clients ORDER BY id_client DESC");
 
                 <input type="text"
                        name="telephone"
+                       maxlength="10"
                        placeholder="Téléphone"
                        required
+                       pattern="[0-9]+"
+                       title="Veuillez saisir uniquement des chiffres"
                        value="<?php
                        if ($editClient) {
                            echo $editClient['telephone'];
                        }
                        ?>">
-
                 <?php
-                if ($editClient) {
-                    echo "<button type='submit' name='modifier'>Modifier</button>";
-                } else {
-                    echo "<button type='submit' name='ajouter'>Ajouter</button>";
-                }
+                    if ($editClient) {
+                        echo "<button type='submit' name='modifier'>Modifier</button>";
+                    } else {
+                        echo "<button type='submit' name='ajouter'>Ajouter</button>";
+                    }
                 ?>
 
             </form>
+
+        </section>
+
+        <!-- Barre de recherche -->
+        <section class="form-box">
+
+            <h3>Rechercher un client</h3>
+
+            <form method="GET" class="search-form">
+
+                <input type="text"
+                       name="search"
+                       placeholder="Rechercher par nom ou téléphone"
+                       value="<?php echo $search; ?>">
+
+                <button type="submit">
+                    Rechercher
+                </button>
+
+                <a href="clients.php" class="btn-back">
+                    Réinitialiser
+                </a>
+
+            </form>
+
+            <?php
+            if ($searchMessage != '') {
+                echo "<div class='error'>" . $searchMessage . "</div>";
+            }
+            ?>
 
         </section>
 
