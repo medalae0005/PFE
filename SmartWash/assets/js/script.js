@@ -1,16 +1,18 @@
-// Confirmation avant suppression
-let deleteButtons = document.querySelectorAll(".btn-delete");
+// Afficher / masquer le mot de passe
+function togglePassword() {
 
-deleteButtons.forEach(function(button) {
+    let passwordInput = document.getElementById("password");
 
-    button.addEventListener("click", function(event) {
+    let toggleText = document.querySelector(".toggle-password");
 
-        let confirmation = confirm("Voulez-vous vraiment supprimer cet élément ?");
+    if (passwordInput.type === "password") {
 
-        if (!confirmation) {
-            event.preventDefault();
-        }
+        passwordInput.type = "text";
+        toggleText.innerHTML = "Hide";
 
-    });
+    } else {
 
-});
+        passwordInput.type = "password";
+        toggleText.innerHTML = "Show";
+    }
+}
