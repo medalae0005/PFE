@@ -189,6 +189,32 @@ button:hover{
     opacity:0.9;
 }
 
+/* Search form */
+.search-form{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.search-form input{
+    margin-bottom:0;
+    display:inline-block;
+}
+
+.search-form a{
+    margin-top:0;
+}
+
+.search-form button{
+    margin-top:0;
+}
+
+.search-form .btn-back{
+    padding:12px 20px;
+    font-size:14px;
+}
+
 /* Tables */
 .table-container{
     width:100%;
@@ -344,6 +370,38 @@ tr:hover{
     text-align:center;
     margin-bottom:10px;
     font-size:14px;
+}
+
+/* Password show/hide */
+.password-box{
+    position:relative;
+    width:400px;
+    max-width:100%;
+}
+
+.password-box input{
+    width:100%;
+    padding-right:45px;
+}
+
+.toggle-password{
+    position:absolute;
+    right:15px;
+    top:38%;
+    transform:translateY(-50%);
+    cursor:pointer;
+    font-size:13px;
+    color:#9ca3af;
+    font-weight:500;
+}
+
+.success-message{
+    background:#DCFCE7;
+    color:#059669;
+    padding:12px;
+    border-radius:10px;
+    margin-bottom:20px;
+    font-weight:500;
 }
 
 /* Responsive tablette */
