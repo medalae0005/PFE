@@ -13,6 +13,7 @@ require '../config/database.php';
 
 // Message d'erreur ou d'information
 $message = '';
+$searchMessage = '';
 
 // Ajouter une nouvelle voiture
 if (isset($_POST['ajouter'])) {
@@ -55,13 +56,44 @@ if (isset($_GET['delete'])) {
 // Récupérer la liste des clients pour le formulaire
 $clients = $pdo->query("SELECT * FROM clients ORDER BY nom ASC");
 
-// Récupérer la liste des voitures avec le nom du client
-$sql = "SELECT voitures.*, clients.nom 
-        FROM voitures 
-        INNER JOIN clients ON voitures.id_client = clients.id_client
-        ORDER BY voitures.id_voiture DESC";
+// Recherche des véhicules
+$search = '';
 
-$voitures = $pdo->query($sql);
+if (isset($_GET['search'])) {
+
+    $search = trim($_GET['search']);
+
+    if ($search == '') {
+        $searchMessage = "Veuillez saisir un mot-clé pour effectuer une recherche.";
+    }
+}
+
+// Récupérer la liste des voitures avec le nom du client
+if ($search != '') {
+
+    $sql = "SELECT voitures.*, clients.nom 
+            FROM voitures 
+            INNER JOIN clients ON voitures.id_client = clients.id_client
+            WHERE voitures.marque LIKE ?
+            OR voitures.modele LIKE ?
+            OR voitures.immatriculation LIKE ?
+            OR clients.nom LIKE ?
+            ORDER BY voitures.id_voiture DESC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(["%$search%", "%$search%", "%$search%", "%$search%"]);
+
+    $voitures = $stmt;
+
+} else {
+
+    $sql = "SELECT voitures.*, clients.nom 
+            FROM voitures 
+            INNER JOIN clients ON voitures.id_client = clients.id_client
+            ORDER BY voitures.id_voiture DESC";
+
+    $voitures = $pdo->query($sql);
+}
 ?>
 
 <!DOCTYPE html>
@@ -71,7 +103,7 @@ $voitures = $pdo->query($sql);
 <title>Voitures - SmartWash</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/style.css?v=3">
+<link rel="stylesheet" href="../assets/css/style.css?v=10">
 </head>
 
 <body>
@@ -159,6 +191,36 @@ $voitures = $pdo->query($sql);
                 </button>
 
             </form>
+
+        </section>
+
+        <!-- Barre de recherche -->
+        <section class="form-box">
+
+            <h3>Rechercher un véhicule</h3>
+
+            <form method="GET" class="search-form">
+
+                <input type="text"
+                       name="search"
+                       placeholder="Rechercher par client, marque ou immatriculation"
+                       value="<?php echo $search; ?>">
+
+                <button type="submit">
+                    Rechercher
+                </button>
+
+                <a href="voitures.php" class="btn-back">
+                    Réinitialiser
+                </a>
+
+            </form>
+
+            <?php
+            if ($searchMessage != '') {
+                echo "<div class='error'>" . $searchMessage . "</div>";
+            }
+            ?>
 
         </section>
 
