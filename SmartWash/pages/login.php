@@ -44,16 +44,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="../assets/css/style.css?v=3">
+<link rel="stylesheet" href="../assets/css/style.css?v=11">
 
 </head>
 
 <body class="login-page">
 
-<!-- Contenu principal -->
 <main class="login-box">
 
-    <!-- Titre -->
     <header>
 
         <h2>SmartWash Admin</h2>
@@ -64,14 +62,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     </header>
 
-    <!-- Message d'erreur -->
     <?php
     if ($error) {
         echo "<div class='error'>" . $error . "</div>";
     }
     ?>
 
-    <!-- Formulaire de connexion -->
     <form method="POST">
 
         <input type="text"
@@ -79,10 +75,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                placeholder="Nom d'utilisateur"
                required>
 
-        <input type="password"
-               name="password"
-               placeholder="Mot de passe"
-               required>
+        <div class="password-box">
+
+            <input type="password"
+                   name="password"
+                   id="password"
+                   placeholder="Mot de passe"
+                   required>
+
+            <span class="toggle-password" onclick="togglePassword()">
+                Show
+            </span>
+
+        </div>
 
         <button type="submit">
             Se connecter
@@ -91,6 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </form>
 
 </main>
+
+<script src="../assets/js/script.js"></script>
 
 </body>
 </html>
