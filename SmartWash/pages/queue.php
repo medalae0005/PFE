@@ -38,6 +38,9 @@ if (isset($_GET['status']) && isset($_GET['id'])) {
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$id]);
 
+        // Simulation de notification WhatsApp
+        $_SESSION['message'] = "Notification WhatsApp envoyée au client.";
+
     } else {
 
         // Mettre le lavage en cours
@@ -97,7 +100,7 @@ $lavages = $pdo->query($sqlLavages);
 <title>File d'attente - SmartWash</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/style.css?v=3">
+<link rel="stylesheet" href="../assets/css/style.css?v=11">
 </head>
 
 <body>
@@ -137,6 +140,18 @@ $lavages = $pdo->query($sqlLavages);
             </div>
 
         </header>
+
+        <!-- Message de notification WhatsApp simulée -->
+        <?php
+        if (isset($_SESSION['message'])) {
+
+            echo "<div class='success-message'>";
+            echo $_SESSION['message'];
+            echo "</div>";
+
+            unset($_SESSION['message']);
+        }
+        ?>
 
         <!-- Formulaire d'ajout à la file d'attente -->
         <section class="form-box">
