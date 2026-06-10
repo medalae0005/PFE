@@ -1,0 +1,161 @@
+<?php
+// Démarrer la session
+session_start();
+
+// Vérifier si l'administrateur est connecté
+if (!isset($_SESSION['admin'])) {
+    header("Location: login.php");
+    exit();
+}
+
+// Connexion à la base de données
+require '../config/database.php';
+
+// Supprimer un lavage de l'historique
+if (isset($_GET['delete'])) {
+
+    $id = $_GET['delete'];
+
+    $stmt = $pdo->prepare("DELETE FROM lavages WHERE id_lavage = ?");
+    $stmt->execute([$id]);
+
+    header("Location: historique.php");
+    exit();
+}
+
+// Récupérer les lavages terminés
+$sql = "SELECT lavages.*,
+               voitures.marque,
+               voitures.modele,
+               voitures.immatriculation,
+               clients.nom,
+               services.nom_service,
+               services.prix
+        FROM lavages
+        INNER JOIN voitures ON lavages.id_voiture = voitures.id_voiture
+        INNER JOIN clients ON voitures.id_client = clients.id_client
+        INNER JOIN services ON lavages.id_service = services.id_service
+        WHERE lavages.statut = 'Terminé'
+        ORDER BY lavages.date_fin DESC";
+
+$lavages = $pdo->query($sql);
+?>
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Historique - SmartWash</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css?v=3">
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Barre latérale de navigation -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            SmartWash
+        </div>
+
+        <nav class="menu">
+            <a href="dashboard.php">Dashboard</a>
+            <a href="clients.php">Clients</a>
+            <a href="voitures.php">Véhicules</a>
+            <a href="queue.php">File d'attente</a>
+            <a href="historique.php">Historique</a>
+        </nav>
+
+        <footer class="sidebar-footer">
+            SmartWash © 2026
+        </footer>
+
+    </aside>
+
+    <!-- Contenu principal -->
+    <main class="main">
+
+        <!-- En-tête de la page -->
+        <header class="top-bar">
+
+            <h2>Historique des lavages</h2>
+
+            <div class="admin-info">
+
+                <span>
+                    Admin : <?php echo $_SESSION['admin']; ?>
+                </span>
+
+                <a href="logout.php" class="logout-btn">
+                    Déconnexion
+                </a>
+
+            </div>
+
+        </header>
+
+        <!-- Tableau des lavages terminés -->
+        <section class="table-container">
+
+            <table>
+
+                <tr>
+                    <th>Client</th>
+                    <th>Véhicule</th>
+                    <th>Immatriculation</th>
+                    <th>Service</th>
+                    <th>Prix</th>
+                    <th>Date arrivée</th>
+                    <th>Date fin</th>
+                    <th>Actions</th>
+                </tr>
+
+                <?php
+                while ($lavage = $lavages->fetch()) {
+
+                    echo "<tr>";
+
+                    echo "<td>" . $lavage['nom'] . "</td>";
+
+                    echo "<td>" . $lavage['marque'] . " " . $lavage['modele'] . "</td>";
+
+                    echo "<td>" . $lavage['immatriculation'] . "</td>";
+
+                    echo "<td>" . $lavage['nom_service'] . "</td>";
+
+                    echo "<td>" . rtrim(rtrim($lavage['prix'], '0'), '.') . " DH</td>";
+
+                    echo "<td>" . $lavage['date_arrivee'] . "</td>";
+
+                    echo "<td>" . $lavage['date_fin'] . "</td>";
+
+                    echo "<td>";
+                    echo "<div class='actions'>";
+
+                    echo "<a class='btn-delete' href='?delete=" . $lavage['id_lavage'] . "'>
+                            Supprimer
+                          </a>";
+
+                    echo "</div>";
+                    echo "</td>";
+
+                    echo "</tr>";
+                }
+                ?>
+
+            </table>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="../assets/js/script.js"></script>
+
+</body>
+</html>
