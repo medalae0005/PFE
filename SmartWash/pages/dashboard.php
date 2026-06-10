@@ -2,7 +2,7 @@
 // Démarrer la session
 session_start();
 
-// Vérifier si l'administrateur est connecté
+// Vérifier si l'administrateur est connecté ou non
 if (!isset($_SESSION['admin'])) {
     header("Location: login.php");
     exit();
