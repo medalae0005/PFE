@@ -14,6 +14,12 @@ require '../config/database.php';
 // Calculer le nombre total des clients
 $totalClients = $pdo->query("SELECT COUNT(*) FROM clients")->fetchColumn();
 
+// Calculer le nombre total des véhicules
+$totalVoitures = $pdo->query("SELECT COUNT(*) FROM voitures")->fetchColumn();
+
+// Calculer le nombre total des lavages
+$totalLavages = $pdo->query("SELECT COUNT(*) FROM lavages")->fetchColumn();
+
 // Calculer le nombre des lavages en attente
 $waiting = $pdo->query("SELECT COUNT(*) FROM lavages WHERE statut = 'En attente'")->fetchColumn();
 
@@ -45,7 +51,7 @@ if (!$revenus) {
 <title>Dashboard - SmartWash</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/css/style.css?v=3">
+<link rel="stylesheet" href="../assets/css/style.css?v=10">
 </head>
 
 <body>
@@ -101,6 +107,16 @@ if (!$revenus) {
             <div class="card">
                 <h4>Total Clients</h4>
                 <h2><?php echo $totalClients; ?></h2>
+            </div>
+
+            <div class="card">
+                <h4>Total Véhicules</h4>
+                <h2><?php echo $totalVoitures; ?></h2>
+            </div>
+
+            <div class="card">
+                <h4>Total Lavages</h4>
+                <h2><?php echo $totalLavages; ?></h2>
             </div>
 
             <div class="card">
