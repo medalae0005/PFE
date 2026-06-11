@@ -19,19 +19,40 @@ $searchMessage = '';
 if (isset($_POST['ajouter'])) {
 
     $id_client = $_POST['id_client'];
-    $marque = $_POST['marque'];
-    $modele = $_POST['modele'];
-    $immatriculation = $_POST['immatriculation'];
-    $couleur = $_POST['couleur'];
+    $marque = trim($_POST['marque']);
+    $modele = trim($_POST['modele']);
+    $immatriculation = trim($_POST['immatriculation']);
+    $couleur = trim($_POST['couleur']);
 
-    $sql = "INSERT INTO voitures(id_client, marque, modele, immatriculation, couleur)
-            VALUES(?, ?, ?, ?, ?)";
+    if ($id_client === '' || $marque === '' || $modele === '' || $immatriculation === '' || $couleur === '') {
 
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$id_client, $marque, $modele, $immatriculation, $couleur]);
+        $message = "Tous les champs doivent être remplis et ne peuvent pas contenir uniquement des espaces.";
 
-    header("Location: voitures.php");
-    exit();
+    } else {
+
+        try {
+
+            $sql = "INSERT INTO voitures(id_client, marque, modele, immatriculation, couleur)
+                    VALUES(?, ?, ?, ?, ?)";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$id_client, $marque, $modele, $immatriculation, $couleur]);
+
+            header("Location: voitures.php");
+            exit();
+
+        } catch (PDOException $e) {
+
+            if ($e->getCode() == 23000) {
+
+                $message = "Cette immatriculation existe déjà chez un autre client.";
+
+            } else {
+
+                $message = "Une erreur est survenue lors de l'ajout du véhicule.";
+            }
+        }
+    }
 }
 
 // Supprimer une voiture
@@ -142,7 +163,7 @@ if ($search != '') {
             <div class="admin-info">
 
                 <span>
-                    Admin : <?php echo $_SESSION['admin']; ?>
+                    <?php echo htmlspecialchars($_SESSION['admin'], ENT_QUOTES, 'UTF-8'); ?>
                 </span>
 
                 <a href="logout.php" class="logout-btn">
@@ -156,7 +177,7 @@ if ($search != '') {
         <!-- Message d'erreur -->
         <?php
         if ($message != '') {
-            echo "<div class='error'>" . $message . "</div>";
+            echo "<div class='error'>" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "</div>";
         }
         ?>
 
@@ -172,19 +193,28 @@ if ($search != '') {
 
                     <?php
                     while ($client = $clients->fetch()) {
-                        echo "<option value='" . $client['id_client'] . "'>" . $client['nom'] . "</option>";
+                        echo "<option value='" . htmlspecialchars($client['id_client'], ENT_QUOTES, 'UTF-8') . "'>" . htmlspecialchars($client['nom'], ENT_QUOTES, 'UTF-8') . "</option>";
                     }
                     ?>
 
                 </select>
 
-                <input type="text" name="marque" placeholder="Marque" required>
+                <input type="text" name="marque" placeholder="Marque" required
+                       pattern="[a-zA-ZÀ-ÿ\s\-']+"
+                       title="Veuillez saisir une marque valide (lettres, espaces, tirets, apostrophes)">
 
-                <input type="text" name="modele" placeholder="Modèle" required>
+                <input type="text" name="modele" placeholder="Modèle" required
+                       pattern="[a-zA-ZÀ-ÿ0-9\s\-']+"
+                       title="Veuillez saisir un modèle valide (lettres, chiffres, espaces, tirets, apostrophes)">
 
-                <input type="text" name="immatriculation" placeholder="Immatriculation" required>
+                <input type="text" name="immatriculation" placeholder="Immatriculation" maxlength="15"
+                       required
+                       pattern="[a-zA-Z0-9\s\-]+"
+                       title="Veuillez saisir une immatriculation valide (lettres, chiffres, espaces, tirets)">
 
-                <input type="text" name="couleur" placeholder="Couleur" required>
+                <input type="text" name="couleur" placeholder="Couleur" required
+                       pattern="[a-zA-ZÀ-ÿ\s\-']+"
+                       title="Veuillez saisir une couleur valide (lettres, espaces, tirets, apostrophes)">
 
                 <button type="submit" name="ajouter">
                     Ajouter
@@ -204,7 +234,7 @@ if ($search != '') {
                 <input type="text"
                        name="search"
                        placeholder="Rechercher par client, marque ou immatriculation"
-                       value="<?php echo $search; ?>">
+                       value="<?php echo htmlspecialchars($search, ENT_QUOTES, 'UTF-8'); ?>">
 
                 <button type="submit">
                     Rechercher
@@ -218,14 +248,14 @@ if ($search != '') {
 
             <?php
             if ($searchMessage != '') {
-                echo "<div class='error'>" . $searchMessage . "</div>";
+                echo "<div class='error'>" . htmlspecialchars($searchMessage, ENT_QUOTES, 'UTF-8') . "</div>";
             }
             ?>
 
         </section>
 
         <!-- Tableau des véhicules -->
-        <section class="table-container">
+        <section class="table-container" id="resultats">
 
             <table>
 
@@ -245,20 +275,20 @@ if ($search != '') {
 
                     echo "<tr>";
 
-                    echo "<td>" . $voiture['id_voiture'] . "</td>";
+                    echo "<td>" . htmlspecialchars($voiture['id_voiture'], ENT_QUOTES, 'UTF-8') . "</td>";
 
-                    echo "<td>" . $voiture['nom'] . "</td>";
+                    echo "<td>" . htmlspecialchars($voiture['nom'], ENT_QUOTES, 'UTF-8') . "</td>";
 
-                    echo "<td>" . $voiture['marque'] . "</td>";
+                    echo "<td>" . htmlspecialchars($voiture['marque'], ENT_QUOTES, 'UTF-8') . "</td>";
 
-                    echo "<td>" . $voiture['modele'] . "</td>";
+                    echo "<td>" . htmlspecialchars($voiture['modele'], ENT_QUOTES, 'UTF-8') . "</td>";
 
-                    echo "<td>" . $voiture['immatriculation'] . "</td>";
+                    echo "<td>" . htmlspecialchars($voiture['immatriculation'], ENT_QUOTES, 'UTF-8') . "</td>";
 
-                    echo "<td>" . $voiture['couleur'] . "</td>";
+                    echo "<td>" . htmlspecialchars($voiture['couleur'], ENT_QUOTES, 'UTF-8') . "</td>";
 
                     echo "<td><div class='actions'>
-                            <a class='btn-delete' href='?delete=" . $voiture['id_voiture'] . "'>
+                            <a class='btn-delete' href='?delete=" . htmlspecialchars($voiture['id_voiture'], ENT_QUOTES, 'UTF-8') . "'>
                                 Supprimer
                             </a>
                           </div></td>";
