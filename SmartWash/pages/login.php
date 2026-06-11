@@ -11,27 +11,31 @@ $error = '';
 // Vérifier si le formulaire est envoyé
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
 
-    // Vérifier si l'utilisateur existe
-    $sql = "SELECT * FROM users WHERE username = ?";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$username]);
-
-    $user = $stmt->fetch();
-
-    // Vérifier les informations de connexion
-    if ($user && $password === $user['password']) {
-
-        $_SESSION['admin'] = $user['username'];
-
-        header('Location: dashboard.php');
-        exit();
-
+    if ($username === '' || $password === '') {
+        $error = "Veuillez remplir tous les champs.";
     } else {
+        // Vérifier si l'utilisateur existe
+        $sql = "SELECT * FROM users WHERE username = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$username]);
 
-        $error = "Nom d'utilisateur ou mot de passe incorrect";
+        $user = $stmt->fetch();
+
+        // Vérifier les informations de connexion
+        if ($user && $password === $user['password']) {
+
+            $_SESSION['admin'] = $user['username'];
+
+            header('Location: dashboard.php');
+            exit();
+
+        } else {
+
+            $error = "Nom d'utilisateur ou mot de passe incorrect";
+        }
     }
 }
 ?>
@@ -64,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <?php
     if ($error) {
-        echo "<div class='error'>" . $error . "</div>";
+        echo "<div class='error'>" . htmlspecialchars($error, ENT_QUOTES, 'UTF-8') . "</div>";
     }
     ?>
 
@@ -73,7 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <input type="text"
                name="username"
                placeholder="Nom d'utilisateur"
-               required>
+               required
+               pattern="[a-zA-ZÀ-ÿ0-9_\-]+"
+               title="Veuillez saisir un nom d'utilisateur valide (lettres, chiffres, tirets, underscores)">
 
         <div class="password-box">
 
