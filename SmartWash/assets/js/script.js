@@ -16,3 +16,21 @@ function togglePassword() {
         toggleText.innerHTML = "Show";
     }
 }
+
+// Focus pour la barre de recherche...
+document.addEventListener('DOMContentLoaded', function () {
+
+    const searchInput = document.querySelector('input[name="search"]');
+
+    if (searchInput && searchInput.value.trim() !== '') {
+
+        const results = document.querySelector('.table-container');
+
+        if (results) {
+            results.scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+    }
+
+});
