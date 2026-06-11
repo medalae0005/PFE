@@ -42,15 +42,33 @@ body{
     display:block;
     text-decoration:none;
     color:#374151;
-    padding:12px;
+    padding:13px 15px;
     margin-bottom:10px;
-    border-radius:10px;
-    transition:0.2s;
+    border-radius:12px;
+    transition:0.3s ease;
+    font-weight:500;
 }
 
 .menu a:hover{
-    background:#EEF4FF;
-    color:#1D4ED8;
+    background:#1D4ED8;
+    color:#FFFFFF;
+    transform:translateX(5px);
+    box-shadow:0 4px 12px rgba(29,78,216,0.15);
+}
+
+.menu a span{
+    position:relative;
+    z-index:1;
+}
+
+.menu a:hover::before{
+    width:100%;
+}
+
+.menu a:hover{
+    color:#FFFFFF;
+    transform:translateX(5px);
+    box-shadow:0 4px 10px rgba(29,78,216,0.15);
 }
 
 .sidebar-footer{
@@ -495,4 +513,103 @@ tr:hover{
         flex-direction:column;
     }
 
+}
+
+/* Animations simples */
+.card,
+.box,
+.form-box,
+.table-container,
+.login-box{
+    animation: fadeIn 0.4s ease;
+}
+
+.card,
+.box,
+.form-box,
+.table-container{
+    transition:0.3s;
+}
+
+.card:hover,
+.form-box:hover,
+.box:hover{
+    transform:translateY(-3px);
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+}
+
+.menu a,
+button,
+.btn-back,
+.btn-delete,
+.logout-btn{
+    transition:0.3s;
+}
+
+.menu a:hover,
+button:hover,
+.btn-back:hover,
+.btn-delete:hover,
+.logout-btn:hover{
+    transform:translateY(-2px);
+}
+
+input,
+select{
+    transition:0.3s;
+}
+
+input:focus,
+select:focus{
+    box-shadow:0 0 0 3px rgba(29,78,216,0.12);
+}
+
+.error{
+    animation:shake 0.3s ease;
+}
+
+.success-message{
+    animation:fadeIn 0.4s ease;
+}
+
+tr{
+    transition:0.2s;
+}
+
+@keyframes fadeIn{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+@keyframes shake{
+    0%{
+        transform:translateX(0);
+    }
+
+    25%{
+        transform:translateX(-4px);
+    }
+
+    50%{
+        transform:translateX(4px);
+    }
+
+    75%{
+        transform:translateX(-4px);
+    }
+
+    100%{
+        transform:translateX(0);
+    }
+}
+
+#resultats:focus{
+    outline:none;
 }
