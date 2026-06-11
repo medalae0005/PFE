@@ -90,7 +90,7 @@ if (!$revenus) {
             <div class="admin-info">
 
                 <span>
-                    Admin : <?php echo $_SESSION['admin']; ?>
+                    <?php echo htmlspecialchars($_SESSION['admin'], ENT_QUOTES, 'UTF-8'); ?>
                 </span>
 
                 <a href="logout.php" class="logout-btn">
@@ -106,32 +106,32 @@ if (!$revenus) {
 
             <div class="card">
                 <h4>Total Clients</h4>
-                <h2><?php echo $totalClients; ?></h2>
+                <h2><?php echo htmlspecialchars($totalClients, ENT_QUOTES, 'UTF-8'); ?></h2>
             </div>
 
             <div class="card">
                 <h4>Total Véhicules</h4>
-                <h2><?php echo $totalVoitures; ?></h2>
+                <h2><?php echo htmlspecialchars($totalVoitures, ENT_QUOTES, 'UTF-8'); ?></h2>
             </div>
 
             <div class="card">
                 <h4>Total Lavages</h4>
-                <h2><?php echo $totalLavages; ?></h2>
+                <h2><?php echo htmlspecialchars($totalLavages, ENT_QUOTES, 'UTF-8'); ?></h2>
             </div>
 
             <div class="card">
                 <h4>En attente</h4>
-                <h2><?php echo $waiting; ?></h2>
+                <h2><?php echo htmlspecialchars($waiting, ENT_QUOTES, 'UTF-8'); ?></h2>
             </div>
 
             <div class="card">
                 <h4>En cours</h4>
-                <h2><?php echo $inProgress; ?></h2>
+                <h2><?php echo htmlspecialchars($inProgress, ENT_QUOTES, 'UTF-8'); ?></h2>
             </div>
 
             <div class="card">
                 <h4>Terminés</h4>
-                <h2><?php echo $completed; ?></h2>
+                <h2><?php echo htmlspecialchars($completed, ENT_QUOTES, 'UTF-8'); ?></h2>
             </div>
 
         </section>
@@ -142,7 +142,7 @@ if (!$revenus) {
             <h3>Revenus Totaux</h3>
 
             <h1 class="revenue-text">
-                <?php echo rtrim(rtrim($revenus, '0'), '.'); ?> DH
+                <?php echo htmlspecialchars(number_format($revenus, 0, '.', ' '), ENT_QUOTES, 'UTF-8'); ?> DH
             </h1>
 
         </section>
