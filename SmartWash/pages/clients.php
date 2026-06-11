@@ -19,29 +19,45 @@ $searchMessage = '';
 if (isset($_POST['modifier'])) {
 
     $id_client = $_POST['id_client'];
-    $nom = $_POST['nom'];
-    $telephone = $_POST['telephone'];
+    $nom = trim($_POST['nom']);
+    $telephone = trim($_POST['telephone']);
 
-    $sql = "UPDATE clients SET nom = ?, telephone = ? WHERE id_client = ?";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$nom, $telephone, $id_client]);
+    if ($nom === '') {
+        $message = "Le nom du client ne peut pas être vide.";
+    } elseif ($telephone === '') {
+        $message = "Le téléphone ne peut pas être vide.";
+    } elseif (!preg_match('/^[0-9]{10}$/', $telephone)) {
+        $message = "Le téléphone doit contenir exactement 10 chiffres.";
+    } else {
+        $sql = "UPDATE clients SET nom = ?, telephone = ? WHERE id_client = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$nom, $telephone, $id_client]);
 
-    header("Location: clients.php");
-    exit();
+        header("Location: clients.php");
+        exit();
+    }
 }
 
 // Ajouter un nouveau client
 if (isset($_POST['ajouter'])) {
 
-    $nom = $_POST['nom'];
-    $telephone = $_POST['telephone'];
+    $nom = trim($_POST['nom']);
+    $telephone = trim($_POST['telephone']);
 
-    $sql = "INSERT INTO clients(nom, telephone) VALUES(?, ?)";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$nom, $telephone]);
+    if ($nom === '') {
+        $message = "Le nom du client ne peut pas être vide.";
+    } elseif ($telephone === '') {
+        $message = "Le téléphone ne peut pas être vide.";
+    } elseif (!preg_match('/^[0-9]{10}$/', $telephone)) {
+        $message = "Le téléphone doit contenir exactement 10 chiffres.";
+    } else {
+        $sql = "INSERT INTO clients(nom, telephone) VALUES(?, ?)";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$nom, $telephone]);
 
-    header("Location: clients.php");
-    exit();
+        header("Location: clients.php");
+        exit();
+    }
 }
 
 // Supprimer un client
@@ -50,7 +66,6 @@ if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
 
     try {
-
         $stmt = $pdo->prepare("DELETE FROM clients WHERE id_client = ?");
         $stmt->execute([$id]);
 
@@ -58,7 +73,6 @@ if (isset($_GET['delete'])) {
         exit();
 
     } catch (PDOException $e) {
-
         $message = "Impossible de supprimer ce client car il possède des véhicules ou des lavages enregistrés.";
     }
 }
@@ -84,7 +98,6 @@ if (isset($_GET['search'])) {
     $search = trim($_GET['search']);
 
     if ($search == '') {
-
         $searchMessage = "Veuillez saisir un mot-clé pour effectuer une recherche.";
     }
 }
@@ -103,7 +116,6 @@ if ($search != '') {
     $clients = $stmt;
 
 } else {
-
     $clients = $pdo->query("SELECT * FROM clients ORDER BY id_client DESC");
 }
 ?>
@@ -125,9 +137,9 @@ if ($search != '') {
     <!-- Barre latérale de navigation -->
     <aside class="sidebar">
 
-    <div class="logo">
-        SmartWash
-    </div>
+        <div class="logo">
+            SmartWash
+        </div>
 
         <nav class="menu">
             <a href="dashboard.php">Dashboard</a>
@@ -154,7 +166,7 @@ if ($search != '') {
             <div class="admin-info">
 
                 <span>
-                    Admin : <?php echo $_SESSION['admin']; ?>
+                    <?php echo htmlspecialchars($_SESSION['admin'], ENT_QUOTES, 'UTF-8'); ?>
                 </span>
 
                 <a href="logout.php" class="logout-btn">
@@ -168,7 +180,7 @@ if ($search != '') {
         <!-- Message d'erreur -->
         <?php
         if ($message != '') {
-            echo "<div class='error'>" . $message . "</div>";
+            echo "<div class='error'>" . htmlspecialchars($message, ENT_QUOTES, 'UTF-8') . "</div>";
         }
         ?>
 
@@ -187,7 +199,7 @@ if ($search != '') {
 
                 <?php
                 if ($editClient) {
-                    echo "<input type='hidden' name='id_client' value='" . $editClient['id_client'] . "'>";
+                    echo "<input type='hidden' name='id_client' value='" . htmlspecialchars($editClient['id_client'], ENT_QUOTES, 'UTF-8') . "'>";
                 }
                 ?>
 
@@ -195,30 +207,34 @@ if ($search != '') {
                        name="nom"
                        placeholder="Nom du client"
                        required
+                       pattern="[a-zA-ZÀ-ÿ\s\-']+"
+                       title="Veuillez saisir un nom valide (lettres, espaces, tirets, apostrophes)"
                        value="<?php
                        if ($editClient) {
-                           echo $editClient['nom'];
+                           echo htmlspecialchars($editClient['nom'], ENT_QUOTES, 'UTF-8');
                        }
                        ?>">
 
                 <input type="text"
                        name="telephone"
+                       minlength="10"
                        maxlength="10"
                        placeholder="Téléphone"
                        required
-                       pattern="[0-9]+"
-                       title="Veuillez saisir uniquement des chiffres"
+                       pattern="[0-9]{10}"
+                       title="Veuillez saisir exactement 10 chiffres"
                        value="<?php
                        if ($editClient) {
-                           echo $editClient['telephone'];
+                           echo htmlspecialchars($editClient['telephone'], ENT_QUOTES, 'UTF-8');
                        }
                        ?>">
+
                 <?php
-                    if ($editClient) {
-                        echo "<button type='submit' name='modifier'>Modifier</button>";
-                    } else {
-                        echo "<button type='submit' name='ajouter'>Ajouter</button>";
-                    }
+                if ($editClient) {
+                    echo "<button type='submit' name='modifier'>Modifier</button>";
+                } else {
+                    echo "<button type='submit' name='ajouter'>Ajouter</button>";
+                }
                 ?>
 
             </form>
@@ -235,7 +251,7 @@ if ($search != '') {
                 <input type="text"
                        name="search"
                        placeholder="Rechercher par nom ou téléphone"
-                       value="<?php echo $search; ?>">
+                       value="<?php echo htmlspecialchars($search, ENT_QUOTES, 'UTF-8'); ?>">
 
                 <button type="submit">
                     Rechercher
@@ -249,14 +265,14 @@ if ($search != '') {
 
             <?php
             if ($searchMessage != '') {
-                echo "<div class='error'>" . $searchMessage . "</div>";
+                echo "<div class='error'>" . htmlspecialchars($searchMessage, ENT_QUOTES, 'UTF-8') . "</div>";
             }
             ?>
 
         </section>
 
         <!-- Tableau des clients -->
-        <section class="table-container">
+        <section class="table-container" id="resultats">
 
             <table>
 
@@ -268,24 +284,23 @@ if ($search != '') {
                 </tr>
 
                 <?php
-
                 while ($client = $clients->fetch()) {
 
                     echo "<tr>";
 
-                    echo "<td>" . $client['id_client'] . "</td>";
+                    echo "<td>" . htmlspecialchars($client['id_client'], ENT_QUOTES, 'UTF-8') . "</td>";
 
-                    echo "<td>" . $client['nom'] . "</td>";
+                    echo "<td>" . htmlspecialchars($client['nom'], ENT_QUOTES, 'UTF-8') . "</td>";
 
-                    echo "<td>" . $client['telephone'] . "</td>";
+                    echo "<td>" . htmlspecialchars($client['telephone'], ENT_QUOTES, 'UTF-8') . "</td>";
 
                     echo "<td><div class='actions'>
 
-                            <a class='btn-back' href='?edit=" . $client['id_client'] . "'>
+                            <a class='btn-back' href='?edit=" . htmlspecialchars($client['id_client'], ENT_QUOTES, 'UTF-8') . "'>
                                 Modifier
                             </a>
 
-                            <a class='btn-delete' href='?delete=" . $client['id_client'] . "'>
+                            <a class='btn-delete' href='?delete=" . htmlspecialchars($client['id_client'], ENT_QUOTES, 'UTF-8') . "'>
                                 Supprimer
                             </a>
 
@@ -293,7 +308,6 @@ if ($search != '') {
 
                     echo "</tr>";
                 }
-
                 ?>
 
             </table>
