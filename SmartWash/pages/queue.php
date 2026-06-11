@@ -14,15 +14,31 @@ require '../config/database.php';
 // Ajouter un lavage à la file d'attente
 if (isset($_POST['ajouter'])) {
 
-    $id_voiture = $_POST['id_voiture'];
-    $id_service = $_POST['id_service'];
+    $id_voiture = trim($_POST['id_voiture']);
+    $id_service = trim($_POST['id_service']);
 
-    $sql = "INSERT INTO lavages(id_voiture, id_service) VALUES(?, ?)";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$id_voiture, $id_service]);
+    if ($id_voiture === '' || $id_service === '') {
 
-    header("Location: queue.php");
-    exit();
+        $_SESSION['message'] = "Veuillez choisir un véhicule et un service.";
+
+    } else {
+
+        try {
+
+            $sql = "INSERT INTO lavages(id_voiture, id_service) VALUES(?, ?)";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$id_voiture, $id_service]);
+
+            $_SESSION['message'] = "Le lavage a été ajouté à la file d'attente.";
+
+            header("Location: queue.php");
+            exit();
+
+        } catch (PDOException $e) {
+
+            $_SESSION['message'] = "Une erreur est survenue lors de l'ajout du lavage.";
+        }
+    }
 }
 
 // Modifier le statut d'un lavage
@@ -31,22 +47,25 @@ if (isset($_GET['status']) && isset($_GET['id'])) {
     $status = $_GET['status'];
     $id = $_GET['id'];
 
-    // Marquer le lavage comme terminé
     if ($status == 'terminee') {
 
         $sql = "UPDATE lavages SET statut = 'Terminé', date_fin = NOW() WHERE id_lavage = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$id]);
 
-        // Simulation de notification WhatsApp
-        $_SESSION['message'] = "Notification WhatsApp envoyée au client.";
+        $_SESSION['message'] = "Lavage terminé. Notification WhatsApp envoyée au client.";
+
+    } elseif ($status == 'En cours') {
+
+        $sql = "UPDATE lavages SET statut = 'En cours' WHERE id_lavage = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$id]);
+
+        $_SESSION['message'] = "Le lavage est maintenant en cours.";
 
     } else {
 
-        // Mettre le lavage en cours
-        $sql = "UPDATE lavages SET statut = ? WHERE id_lavage = ?";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$status, $id]);
+        $_SESSION['message'] = "Statut invalide.";
     }
 
     header("Location: queue.php");
@@ -58,11 +77,20 @@ if (isset($_GET['delete'])) {
 
     $id = $_GET['delete'];
 
-    $stmt = $pdo->prepare("DELETE FROM lavages WHERE id_lavage = ?");
-    $stmt->execute([$id]);
+    try {
 
-    header("Location: queue.php");
-    exit();
+        $stmt = $pdo->prepare("DELETE FROM lavages WHERE id_lavage = ?");
+        $stmt->execute([$id]);
+
+        $_SESSION['message'] = "Le lavage a été supprimé.";
+
+        header("Location: queue.php");
+        exit();
+
+    } catch (PDOException $e) {
+
+        $_SESSION['message'] = "Impossible de supprimer ce lavage.";
+    }
 }
 
 // Récupérer la liste des voitures avec le client
@@ -76,21 +104,64 @@ $voitures = $pdo->query($sqlVoitures);
 // Récupérer la liste des services
 $services = $pdo->query("SELECT * FROM services ORDER BY nom_service ASC");
 
-// Récupérer la liste des lavages avec client, voiture et service
-$sqlLavages = "SELECT lavages.*,
-                      voitures.marque,
-                      voitures.modele,
-                      voitures.immatriculation,
-                      clients.nom,
-                      services.nom_service,
-                      services.prix
-               FROM lavages
-               INNER JOIN voitures ON lavages.id_voiture = voitures.id_voiture
-               INNER JOIN clients ON voitures.id_client = clients.id_client
-               INNER JOIN services ON lavages.id_service = services.id_service
-               ORDER BY lavages.date_arrivee DESC";
+// Recherche des lavages
+$search = '';
 
-$lavages = $pdo->query($sqlLavages);
+if (isset($_GET['search'])) {
+    $search = trim($_GET['search']);
+}
+
+// Récupérer la liste des lavages avec client, voiture et service
+if ($search != '') {
+
+    $sqlLavages = "SELECT lavages.*,
+                          voitures.marque,
+                          voitures.modele,
+                          voitures.immatriculation,
+                          clients.nom,
+                          services.nom_service,
+                          services.prix
+                   FROM lavages
+                   INNER JOIN voitures ON lavages.id_voiture = voitures.id_voiture
+                   INNER JOIN clients ON voitures.id_client = clients.id_client
+                   INNER JOIN services ON lavages.id_service = services.id_service
+                   WHERE clients.nom LIKE ?
+                   OR voitures.marque LIKE ?
+                   OR voitures.modele LIKE ?
+                   OR voitures.immatriculation LIKE ?
+                   OR services.nom_service LIKE ?
+                   OR lavages.statut LIKE ?
+                   ORDER BY lavages.date_arrivee DESC";
+
+    $stmt = $pdo->prepare($sqlLavages);
+    $stmt->execute([
+        "%$search%",
+        "%$search%",
+        "%$search%",
+        "%$search%",
+        "%$search%",
+        "%$search%"
+    ]);
+
+    $lavages = $stmt;
+
+} else {
+
+    $sqlLavages = "SELECT lavages.*,
+                          voitures.marque,
+                          voitures.modele,
+                          voitures.immatriculation,
+                          clients.nom,
+                          services.nom_service,
+                          services.prix
+                   FROM lavages
+                   INNER JOIN voitures ON lavages.id_voiture = voitures.id_voiture
+                   INNER JOIN clients ON voitures.id_client = clients.id_client
+                   INNER JOIN services ON lavages.id_service = services.id_service
+                   ORDER BY lavages.date_arrivee DESC";
+
+    $lavages = $pdo->query($sqlLavages);
+}
 ?>
 
 <!DOCTYPE html>
@@ -135,18 +206,20 @@ $lavages = $pdo->query($sqlLavages);
             <h2>File d'attente</h2>
 
             <div class="admin-info">
-                <span>Admin : <?php echo $_SESSION['admin']; ?></span>
+                <span>
+                    <?php echo htmlspecialchars($_SESSION['admin'], ENT_QUOTES, 'UTF-8'); ?>
+                </span>
                 <a href="logout.php" class="logout-btn">Déconnexion</a>
             </div>
 
         </header>
 
-        <!-- Message de notification WhatsApp simulée -->
+        <!-- Message -->
         <?php
         if (isset($_SESSION['message'])) {
 
             echo "<div class='success-message'>";
-            echo $_SESSION['message'];
+            echo htmlspecialchars($_SESSION['message'], ENT_QUOTES, 'UTF-8');
             echo "</div>";
 
             unset($_SESSION['message']);
@@ -165,11 +238,11 @@ $lavages = $pdo->query($sqlLavages);
 
                     <?php
                     while ($voiture = $voitures->fetch()) {
-                        echo "<option value='" . $voiture['id_voiture'] . "'>";
-                        echo $voiture['nom'] . " - ";
-                        echo $voiture['marque'] . " ";
-                        echo $voiture['modele'] . " (";
-                        echo $voiture['immatriculation'] . ")";
+                        echo "<option value='" . htmlspecialchars($voiture['id_voiture'], ENT_QUOTES, 'UTF-8') . "'>";
+                        echo htmlspecialchars($voiture['nom'], ENT_QUOTES, 'UTF-8') . " - ";
+                        echo htmlspecialchars($voiture['marque'], ENT_QUOTES, 'UTF-8') . " ";
+                        echo htmlspecialchars($voiture['modele'], ENT_QUOTES, 'UTF-8') . " (";
+                        echo htmlspecialchars($voiture['immatriculation'], ENT_QUOTES, 'UTF-8') . ")";
                         echo "</option>";
                     }
                     ?>
@@ -181,9 +254,9 @@ $lavages = $pdo->query($sqlLavages);
 
                     <?php
                     while ($service = $services->fetch()) {
-                        echo "<option value='" . $service['id_service'] . "'>";
-                        echo $service['nom_service'] . " - ";
-                        echo rtrim(rtrim($service['prix'], '0'), '.') . " DH";
+                        echo "<option value='" . htmlspecialchars($service['id_service'], ENT_QUOTES, 'UTF-8') . "'>";
+                        echo htmlspecialchars($service['nom_service'], ENT_QUOTES, 'UTF-8') . " - ";
+                        echo htmlspecialchars(number_format($service['prix'], 0, '.', ' '), ENT_QUOTES, 'UTF-8') . " DH";
                         echo "</option>";
                     }
                     ?>
@@ -193,6 +266,30 @@ $lavages = $pdo->query($sqlLavages);
                 <button type="submit" name="ajouter">
                     Ajouter à la file
                 </button>
+
+            </form>
+
+        </section>
+
+        <!-- Barre de recherche -->
+        <section class="form-box">
+
+            <h3>Rechercher un lavage</h3>
+
+            <form method="GET" class="search-form">
+
+                <input type="text"
+                       name="search"
+                       placeholder="Client, véhicule, service ou statut"
+                       value="<?php echo htmlspecialchars($search, ENT_QUOTES, 'UTF-8'); ?>">
+
+                <button type="submit">
+                    Rechercher
+                </button>
+
+                <a href="queue.php" class="btn-back">
+                    Réinitialiser
+                </a>
 
             </form>
 
@@ -219,15 +316,15 @@ $lavages = $pdo->query($sqlLavages);
 
                     echo "<tr>";
 
-                    echo "<td>" . $lavage['nom'] . "</td>";
+                    echo "<td>" . htmlspecialchars($lavage['nom'], ENT_QUOTES, 'UTF-8') . "</td>";
 
-                    echo "<td>" . $lavage['marque'] . " " . $lavage['modele'] . "</td>";
+                    echo "<td>" . htmlspecialchars($lavage['marque'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($lavage['modele'], ENT_QUOTES, 'UTF-8') . "</td>";
 
-                    echo "<td>" . $lavage['immatriculation'] . "</td>";
+                    echo "<td>" . htmlspecialchars($lavage['immatriculation'], ENT_QUOTES, 'UTF-8') . "</td>";
 
-                    echo "<td>" . $lavage['nom_service'] . "</td>";
+                    echo "<td>" . htmlspecialchars($lavage['nom_service'], ENT_QUOTES, 'UTF-8') . "</td>";
 
-                    echo "<td>" . rtrim(rtrim($lavage['prix'], '0'), '.') . " DH</td>";
+                    echo "<td>" . htmlspecialchars(number_format($lavage['prix'], 0, '.', ' '), ENT_QUOTES, 'UTF-8') . " DH</td>";
 
                     echo "<td>";
 
@@ -241,18 +338,18 @@ $lavages = $pdo->query($sqlLavages);
 
                     echo "</td>";
 
-                    echo "<td>" . $lavage['date_arrivee'] . "</td>";
+                    echo "<td>" . htmlspecialchars($lavage['date_arrivee'], ENT_QUOTES, 'UTF-8') . "</td>";
 
                     echo "<td>";
                     echo "<div class='actions'>";
 
                     if ($lavage['statut'] == 'En attente') {
-                        echo "<a class='btn-back' href='?status=En cours&id=" . $lavage['id_lavage'] . "'>Commencer</a>";
+                        echo "<a class='btn-back' href='?status=En cours&id=" . htmlspecialchars($lavage['id_lavage'], ENT_QUOTES, 'UTF-8') . "'>Commencer</a>";
                     } elseif ($lavage['statut'] == 'En cours') {
-                        echo "<a class='btn-back' href='?status=terminee&id=" . $lavage['id_lavage'] . "'>Terminer</a>";
+                        echo "<a class='btn-back' href='?status=terminee&id=" . htmlspecialchars($lavage['id_lavage'], ENT_QUOTES, 'UTF-8') . "'>Terminer</a>";
                     }
 
-                    echo "<a class='btn-delete' href='?delete=" . $lavage['id_lavage'] . "'>Supprimer</a>";
+                    echo "<a class='btn-delete' href='?delete=" . htmlspecialchars($lavage['id_lavage'], ENT_QUOTES, 'UTF-8') . "'>Supprimer</a>";
 
                     echo "</div>";
                     echo "</td>";
@@ -270,6 +367,21 @@ $lavages = $pdo->query($sqlLavages);
 </div>
 
 <script src="../assets/js/script.js"></script>
+
+<script>
+const searchInput = document.querySelector('input[name="search"]');
+
+if (searchInput && searchInput.value.trim() !== '') {
+
+    const results = document.querySelector('.table-container');
+
+    if (results) {
+        results.scrollIntoView({
+            behavior: 'smooth'
+        });
+    }
+}
+</script>
 
 </body>
 </html>
