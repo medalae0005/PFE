@@ -130,7 +130,7 @@ if ($search != '') {
             <div class="admin-info">
 
                 <span>
-                    Admin : <?php echo $_SESSION['admin']; ?>
+                    <?php echo htmlspecialchars($_SESSION['admin'], ENT_QUOTES, 'UTF-8'); ?>
                 </span>
 
                 <a href="logout.php" class="logout-btn">
@@ -151,7 +151,7 @@ if ($search != '') {
                 <input type="text"
                        name="search"
                        placeholder="Rechercher par client, véhicule ou service"
-                       value="<?php echo $search; ?>">
+                       value="<?php echo htmlspecialchars($search, ENT_QUOTES, 'UTF-8'); ?>">
 
                 <button type="submit">
                     Rechercher
@@ -165,13 +165,13 @@ if ($search != '') {
 
             <?php
             if ($searchMessage != '') {
-                echo "<div class='error'>" . $searchMessage . "</div>";
+                echo "<div class='error'>" . htmlspecialchars($searchMessage, ENT_QUOTES, 'UTF-8') . "</div>";
             }
             ?>
 
         </section>
 
-        <section class="table-container">
+        <section class="table-container" id="resultats">
 
             <table>
 
@@ -190,16 +190,16 @@ if ($search != '') {
                 while ($lavage = $lavages->fetch()) {
 
                     echo "<tr>";
-                    echo "<td>" . $lavage['nom'] . "</td>";
-                    echo "<td>" . $lavage['marque'] . " " . $lavage['modele'] . "</td>";
-                    echo "<td>" . $lavage['immatriculation'] . "</td>";
-                    echo "<td>" . $lavage['nom_service'] . "</td>";
+                    echo "<td>" . htmlspecialchars($lavage['nom'], ENT_QUOTES, 'UTF-8') . "</td>";
+                    echo "<td>" . htmlspecialchars($lavage['marque'], ENT_QUOTES, 'UTF-8') . " " . htmlspecialchars($lavage['modele'], ENT_QUOTES, 'UTF-8') . "</td>";
+                    echo "<td>" . htmlspecialchars($lavage['immatriculation'], ENT_QUOTES, 'UTF-8') . "</td>";
+                    echo "<td>" . htmlspecialchars($lavage['nom_service'], ENT_QUOTES, 'UTF-8') . "</td>";
                     echo "<td>" . rtrim(rtrim($lavage['prix'], '0'), '.') . " DH</td>";
                     echo "<td>" . $lavage['date_arrivee'] . "</td>";
                     echo "<td>" . $lavage['date_fin'] . "</td>";
 
                     echo "<td><div class='actions'>
-                            <a class='btn-delete' href='?delete=" . $lavage['id_lavage'] . "'>
+                            <a class='btn-delete' href='?delete=" . htmlspecialchars($lavage['id_lavage'], ENT_QUOTES, 'UTF-8') . "'>
                                 Supprimer
                             </a>
                           </div></td>";
